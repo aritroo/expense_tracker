@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:expense_tracker/models/expense.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:sizer/sizer.dart';
@@ -28,6 +30,36 @@ class _NewExpenseState extends State<NewExpense> {
     super.dispose();
   }
 
+  void _dialogBox() {
+    Platform.isIOS
+        ? showCupertinoDialog(
+            context: context,
+            builder: (ctx) => CupertinoAlertDialog(
+              title: Text('Invalid Input'),
+              content: Text('Please enter valid Title,Date and Amount.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text('Okay'),
+                ),
+              ],
+            ),
+          )
+        : showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text('Invalid Input'),
+              content: Text('Please enter valid Title,Date and Amount.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text('Okay'),
+                ),
+              ],
+            ),
+          );
+  }
+
   void _submitExpenseData() {
     final enteredAmount = double.tryParse(_amountController.text);
     final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
@@ -35,19 +67,7 @@ class _NewExpenseState extends State<NewExpense> {
     if (_titleController.text.trim().isEmpty ||
         amountIsInvalid ||
         _selectedDate == null) {
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text('Invalid Input'),
-          content: Text('Please enter valid Title,Date and Amount.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text('Okay'),
-            ),
-          ],
-        ),
-      );
+      _dialogBox();
       return;
     }
     widget.onAddExpense(
